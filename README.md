@@ -1,7 +1,7 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
 
-### Project Introduction
+## Project Introduction
 
 The goal of this project to drive the around the track with no incidents and maintain a speed close to, but under the speed limit. 
 
