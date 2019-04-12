@@ -101,7 +101,7 @@ The lane choice from the behaviour planning section is used to generate a new tr
 
 ## Results
 
-The car is able to successfully drive around the track with no incidents. A clip of the car driving in the simulator can be found here.
+The car is able to successfully drive around the track with no incidents. A clip of the car driving in the simulator can be found [here](https://github.com/anammy/CarND-PathPlanning/blob/master/video/PathPlanningClip.mp4).
 
 ---
 
