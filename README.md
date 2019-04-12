@@ -1,21 +1,34 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
-   
-### Simulator.
-You can download the Term3 Simulator which contains the Path Planning Project from the [releases tab (https://github.com/udacity/self-driving-car-sim/releases/tag/T3_v1.2).  
+
+### Project Introduction
+
+The goal of this project to drive the around the track with no incidents and maintain a speed close to, but under the speed limit. 
+
+### Objectives
+
+- The car should maintain a speed close to the speed limit of 50 MPH. The traffic around the car is driving at +- 10 MPH of the 50 MPH speed limit. The car should pass slower moving traffic  when it is safe to do so.
+
+- The car should not collide with any other cars and should drive within the lane markers, unless changing lanes.
+
+- The car should be able to make one complete loop around the 6946m highway.
+
+- The car should not exceed a total acceleration of 10 m/s^2 and jerk greater than 10 m/s^3. 
+
+### Simulator
+
+The simulator used in this project can be downloaded from [releases tab (https://github.com/udacity/self-driving-car-sim/releases/tag/T3_v1.2).  
 
 To run the simulator on Mac/Linux, first make the binary file executable with the following command:
 ```shell
 sudo chmod u+x {simulator_file_name}
 ```
 
-### Goals
-In this project your goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit. You will be provided the car's localization and sensor fusion data, there is also a sparse map list of waypoints around the highway. The car should try to go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible, note that other cars will try to change lanes too. The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. The car should be able to make one complete loop around the 6946m highway. Since the car is trying to go 50 MPH, it should take a little over 5 minutes to complete 1 loop. Also the car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 10 m/s^3.
-
-#### The map of the highway is in data/highway_map.txt
-Each waypoint in the list contains  [x,y,s,dx,dy] values. x and y are the waypoint's map coordinate position, the s value is the distance along the road to get to that waypoint in meters, the dx and dy values define the unit normal vector pointing outward of the highway loop.
+The map of the highway is in data/highway_map.txt. The car's localization and sensor fusion data is provided by the simulator. There is also a sparse map list of waypoints around the highway. Each waypoint in the list contains  [x,y,s,dx,dy] values. x and y are the waypoint's map coordinate position, the s value is the distance along the road to get to that waypoint in meters, the dx and dy values define the unit normal vector pointing outward of the highway loop.
 
 The highway's waypoints loop around so the frenet s value, distance along the road, goes from 0 to 6945.554.
+
+####
 
 ## Basic Build Instructions
 
@@ -63,11 +76,32 @@ the path has processed since last time.
 
 1. The car uses a perfect controller and will visit every (x,y) point it recieves in the list every .02 seconds. The units for the (x,y) points are in meters and the spacing of the points determines the speed of the car. The vector going from a point to the next point in the list dictates the angle of the car. Acceleration both in the tangential and normal directions is measured along with the jerk, the rate of change of total Acceleration. The (x,y) point paths that the planner recieves should not have a total acceleration that goes over 10 m/s^2, also the jerk should not go over 50 m/s^3. (NOTE: As this is BETA, these requirements might change. Also currently jerk is over a .02 second interval, it would probably be better to average total acceleration over 1 second and measure jerk from that.
 
-2. There will be some latency between the simulator running and the path planner returning a path, with optimized code usually its not very long maybe just 1-3 time steps. During this delay the simulator will continue using points that it was last given, because of this its a good idea to store the last points you have used so you can have a smooth transition. previous_path_x, and previous_path_y can be helpful for this transition since they show the last points given to the simulator controller with the processed points already removed. You would either return a path that extends this previous path or make sure to create a new path that has a smooth transition with this last path.
+2. There will be some latency between the simulator running and the path planner returning a path. With optimized code, it is usually just 1-3 time steps. During this delay the simulator will continue using points that it was last given.
 
-## Tips
+## Code
 
-A really helpful resource for doing this project and creating smooth trajectories was using http://kluge.in-chemnitz.de/opensource/spline/, the spline function is in a single hearder file is really easy to use.
+The code consists of 3 main sections: Prediction, Behaviour Planning, and Trajectory Generation.
+
+#### Prediction
+
+In the prediction section, the sensor fusion data is used to check if there is a slow car ahead, a car in the left lane within 30 m, and/or a car in the right lane within 30 m. If any of these conditions are satisfied, the corresponding flags are set. If the other vehicles are ahead of our car, the s values of these other vehicles are stored.
+
+#### Behaviour Planning
+
+In the behaviour planning section, the flags from the prediction section are used to determine whether to stay in the same lane or perform a lane change when safe if there is a slow car ahead. The lane change is only performed if the forward progress achieved by the lane change is greater than 10m. Also, if both left and right lanes are available for a lane change, whichever lane has a car thats further ahead and thus, offers a greater forward progress is chosen for the lane change.
+
+If a lane change is not possible, the target car's speed is lowered by 5 m/s increments until it is lower than the speed of the slow car ahead.
+
+After the lane change has been made and the target car has passed the slower traffic, the target car merges back into the middle lane when its safe to do so. The car will then speed up close to the speed limit if there is no slow car ahead.
+
+#### Trajectory Planning
+
+The lane choice from the behaviour planning section is used to generate a new trajectory. The new path uses the last two points from the previous trajectory, if the previous path list is not empty, to ensure a smooth transition (i.e. no sudden accelerations or jerk) between different trajectories. The trajectory planning algorithm from the class is used to generate trajectories using the spline function.
+
+
+## Results
+
+The car is able to successfully drive around the track with no incidents. A clip of the car driving in the simulator can be found here.
 
 ---
 
@@ -91,55 +125,3 @@ A really helpful resource for doing this project and creating smooth trajectorie
     cd uWebSockets
     git checkout e94b6e1
     ```
-
-## Editor Settings
-
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
-
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
-
-## Code Style
-
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
-
-## Project Instructions and Rubric
-
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
-
-
-## Call for IDE Profiles Pull Requests
-
-Help your fellow students!
-
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to ensure
-that students don't feel pressured to use one IDE or another.
-
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
-
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
-
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
-
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
-
