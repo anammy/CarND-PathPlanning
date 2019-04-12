@@ -17,7 +17,7 @@ The goal of this project to drive the around the track with no incidents and mai
 
 ### Simulator
 
-The simulator used in this project can be downloaded from [releases tab (https://github.com/udacity/self-driving-car-sim/releases/tag/T3_v1.2).  
+The simulator used in this project can be downloaded from [releases tab] (https://github.com/udacity/self-driving-car-sim/releases/tag/T3_v1.2).  
 
 To run the simulator on Mac/Linux, first make the binary file executable with the following command:
 ```shell
